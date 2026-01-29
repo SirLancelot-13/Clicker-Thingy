@@ -1,0 +1,13 @@
+exports.isAuthenticated=(req,res,next)=>{
+    try{
+        if(req.isAuthenticated()){
+            next();
+        }
+        else{
+            res.redirect('/auth/google');
+        }
+    }
+    catch(err){
+        next(err);
+    }
+}
