@@ -7,17 +7,26 @@ datasource db {
   provider = "postgresql"
 }
 
-model users {
+model User {
   id          Int     @id @default(autoincrement())
   googleId    String  @unique
   username    String  @unique
   displayName String?
   clicks      Click?
+
+  @@map("users")
 }
 
 model Click {
   id       Int    @id @default(autoincrement())
   username String @unique
   count    Int    @default(0)
-  user     users   @relation(fields: [username], references: [username])
+  user     User   @relation(fields: [username], references: [username])
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
 }

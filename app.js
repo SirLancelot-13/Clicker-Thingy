@@ -40,6 +40,7 @@ app.use(expressSession({
     store: new PrismaSessionStore(
         prisma,
         {
+            modelName: 'Session',
             checkPeriod: 2 * 60 * 1000,  //ms
             dbRecordIdIsSessionId: true,
             dbRecordIdFunction: undefined,

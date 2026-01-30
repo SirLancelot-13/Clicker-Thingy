@@ -14,12 +14,12 @@ passport.use(new GoogleStrategy({
 },
     async function (accessToken, refreshToken, profile, cb) {
         try {
-            let user = await prisma.users.findUnique({
+            let user = await prisma.User.findUnique({
                 where: { googleId: profile.id }
             });
 
             if (!user) {
-                user = await prisma.users.create({
+                user = await prisma.User.create({
                     data: {
                         googleId: profile.id,
                         username: profile.emails[0].value,
@@ -39,7 +39,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await prisma.users.findUnique({ where: { id } });
+        const user = await prisma.User.findUnique({ where: { id } });
         done(null, user);
     } catch (err) {
         done(err);
