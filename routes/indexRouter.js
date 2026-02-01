@@ -4,8 +4,8 @@ const indexController = require('../controllers/indexController.js');
 const authMiddleware = require('../middleware/authMiddleware.js');
 
 // Fix this in the future lmao
-router.get('/', authMiddleware.isAuthenticated,(req, res) => {
-    res.render('dashboard', { user: req.user.username});
+router.get('/', authMiddleware.isAuthenticated, (req, res) => {
+    res.redirect('/dashboard');
 });
 
 

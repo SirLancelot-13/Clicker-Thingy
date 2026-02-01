@@ -9,13 +9,26 @@ exports.getHome = (req, res) => {
     res.send('Welcome to the Clicker Game API');
 };
 
-exports.getDashboard = (req, res) => {
-    res.send(`Hello ${req.user.displayName || req.user.username}, welcome to your dashboard!`);
+exports.getDashboard = async (req, res) => {
+    try {
+        const user = req.user;
+        const clicks = await prisma.click.findUnique({
+            where: {
+                username: user.username
+            }
+        });
+
+        const clickNumber = clicks ? clicks.count : 0;
+        res.render('dashboard', { user: user.username, clicks: clickNumber });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).send('Error loading dashboard');
+    }
 };
 
 exports.getLeaderboard = async (req, res) => {
     try {
-        const clicks = await prisma.Click.findMany({
+        const clicks = await prisma.click.findMany({
             include: { user: true },
             orderBy: { count: 'desc' }
         });
@@ -26,13 +39,13 @@ exports.getLeaderboard = async (req, res) => {
     }
 };
 
-exports.logout = (req,res)=>{
-    req.logout((err)=>{
-        if (err){
+exports.logout = (req, res) => {
+    req.logout((err) => {
+        if (err) {
             console.log(err);
             return res.status(500).send('Error logging out');
         }
-        else{
+        else {
             res.redirect('/');
         }
     })
