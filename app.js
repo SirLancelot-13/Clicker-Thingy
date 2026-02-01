@@ -82,6 +82,10 @@ io.on('connection', (socket) => {
                     },
                 })
             }
+            const updatedClick = await prisma.click.findUnique({
+                where: { username },
+            })
+            data.count = updatedClick.count;
             // Broadcast the click data
             io.emit('click', data);
         } catch (error) {

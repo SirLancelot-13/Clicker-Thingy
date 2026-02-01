@@ -28,6 +28,7 @@
 
             socket.on('click', (data) => {
                 log.textContent = JSON.stringify(data, null, 2);
+                document.getElementById('clicks').textContent = `Clicks: ${data.count}`;
             });
     </script>
 </html>
