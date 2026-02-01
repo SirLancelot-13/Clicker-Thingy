@@ -62,8 +62,23 @@ app.set('io', io);
 io.on('connection', (socket) => {
     console.log('socket connected:', socket.id);
     //Mock thingy for click event. Actually cause this to increase click count by 1 in DB and broadcast new count to all clients
-    socket.on('click', (data) => {
-        io.emit('click', data);
+    socket.on('click', async (data) => {
+        try {
+            const username = data.by;
+            await prisma.Click.upsert({
+                where: { username },
+                update: { count: { increment: 1 } },
+                create: {
+                    username,
+                    count: 1,
+                    user: { connect: { username } }
+                }
+            });
+            // Broadcast the click data
+            io.emit('click', data);
+        } catch (error) {
+            console.error('Error updating click count:', error);
+        }
     });
 
     socket.on('disconnect', () => {

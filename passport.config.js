@@ -23,9 +23,15 @@ passport.use(new GoogleStrategy({
                     data: {
                         googleId: profile.id,
                         username: profile.emails[0].value,
-                        displayName: profile.displayName
+                        displayName: profile.displayName,
+                        clicks: {
+                            create: {
+                                count: 0
+                            }
+                        }
                     }
                 });
+
             }
             return cb(null, user);
         } catch (err) {
