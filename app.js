@@ -4,7 +4,7 @@ const path = require('path');
 const { Server } = require('socket.io');
 const expressSession = require('express-session');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { PrismaClient } = require('./generated/prisma/client.js');
+const { PrismaClient } = require('./generated/prisma');
 require('dotenv').config();
 
 const authRouter = require('./routes/authRouter.js');
@@ -61,9 +61,36 @@ app.set('io', io);
 
 io.on('connection', (socket) => {
     console.log('socket connected:', socket.id);
-    //Mock thingy for click event. Actually cause this to increase click count by 1 in DB and broadcast new count to all clients
-    socket.on('click', (data) => {
-        io.emit('click', data);
+    //Updated this to update click count in db and broadcast the click has been made.
+    socket.on('click', async (data) => {
+        try {
+            const username = data.by;
+            const click = await prisma.click.findUnique({
+                where: { username },
+            })
+
+            if (click) {
+                await prisma.click.update({
+                    where: { id: click.id },
+                    data: { count: { increment: 1 } },
+                })
+            } else {
+                await prisma.click.create({
+                    data: {
+                        count: 1,
+                        user: { connect: { username } },
+                    },
+                })
+            }
+            const updatedClick = await prisma.click.findUnique({
+                where: { username },
+            })
+            data.count = updatedClick.count;
+            // Broadcast the click data
+            io.emit('click', data);
+        } catch (error) {
+            console.error('Error updating click count:', error);
+        }
     });
 
     socket.on('disconnect', () => {

@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Clicker Game — Socket.io Thingy</title>
+    </head>
+    <body>
+        <h1>Clicker Game — Socket.io Test</h1>
+        <p>Username: <%= user %></p>
+        <button id="btn">Send click</button>
+        <div id="clicks">Clicks: <%= clicks %></div>
+        <pre id="log"></pre>
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io();
+            const btn = document.getElementById('btn');
+            const log = document.getElementById('log');
+
+            socket.on('connect', () => {
+                console.log('connected', socket.id);
+            });
+
+            btn.addEventListener('click', () => {
+                const payload = { at: Date.now(), by: "<%= user %>" };
+                socket.emit('click', payload);
+            });
+
+            socket.on('click', (data) => {
+                log.textContent = JSON.stringify(data, null, 2);
+                document.getElementById('clicks').textContent = `Clicks: ${data.count}`;
+            });
+    </script>
+</html>
